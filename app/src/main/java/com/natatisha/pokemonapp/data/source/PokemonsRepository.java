@@ -6,55 +6,51 @@ import com.natatisha.pokemonapp.data.model.Pokemon;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 
-public class PokemonsRepository implements PokemonsDataSource {
+public class PokemonsRepository {
 
-    private PokemonsDataSource mLocalDataSource;
+    private static final int PAGE_SIZE = 30;
 
-    private PokemonsDataSource mRemoteDataSource;
+    private PokemonsDataSource.Local mLocalDataSource;
+
+    private PokemonsDataSource.Remote mRemoteDataSource;
 
     private boolean cacheIsDirty = true;
 
-    public PokemonsRepository(@NonNull PokemonsDataSource localDataSource,
-                              @NonNull PokemonsDataSource remoteDataSource) {
+    @Inject
+    public PokemonsRepository(@NonNull PokemonsDataSource.Local localDataSource,
+                              @NonNull PokemonsDataSource.Remote remoteDataSource) {
         this.mLocalDataSource = localDataSource;
         this.mRemoteDataSource = remoteDataSource;
     }
 
-    @Override
     public void refreshData() {
         cacheIsDirty = true;
     }
 
-    @Override
     public Observable<List<Pokemon>> getPokemonsList(int page) {
         if (cacheIsDirty) {
-            return mRemoteDataSource.getPokemonsList(page).
-                    doOnNext(pokemonList -> {
-                        mLocalDataSource.savePokemonsList(pokemonList);
-                    });
+            return mRemoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE).
+                    doOnNext(pokemonList -> mLocalDataSource.savePokemonsList(pokemonList));
         }
-        return mLocalDataSource.getPokemonsList(page);
+        return mLocalDataSource.getPokemonsList();
     }
 
-    @Override
     public Observable<Pokemon> getPokemon(int id) {
         if (cacheIsDirty) {
             return mRemoteDataSource.getPokemon(id).
-                    doOnNext(pokemon -> {
-                        mLocalDataSource.savePokemon(pokemon);
-                    });
+                    doOnNext(pokemon -> mLocalDataSource.savePokemon(pokemon));
         }
         return mLocalDataSource.getPokemon(id);
     }
 
-    @Override
     public void savePokemon(@NonNull Pokemon pokemon) {
         mLocalDataSource.savePokemon(pokemon);
     }
 
-    @Override
     public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
         mLocalDataSource.savePokemonsList(pokemonList);
     }

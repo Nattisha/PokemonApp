@@ -1,7 +1,5 @@
 package com.natatisha.pokemonapp.data.source;
 
-import android.support.annotation.NonNull;
-
 import com.natatisha.pokemonapp.data.model.NamedApiResource;
 import com.natatisha.pokemonapp.data.model.Pokemon;
 import com.natatisha.pokemonapp.network.PokemonApiProvider;
@@ -13,7 +11,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class PokemonsRemoteDataSource implements PokemonsDataSource {
+public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
 
     private PokemonApiProvider apiProvider;
 
@@ -23,20 +21,22 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource {
     }
 
     @Override
-    public void refreshData() {
-        //do nothing
-    }
-
-    @Override
-    public Observable<List<Pokemon>> getPokemonsList(int page) {
+    public Observable<List<Pokemon>> getPokemonsList(int offset, int limit) {
         return apiProvider.getPokemonApi().
-                getPokemonList(page * PAGE_SIZE, PAGE_SIZE).map(namedApiResourceList -> {
+                getPokemonList(offset, limit).map(namedApiResourceList -> {
             List<Pokemon> result = new ArrayList<>();
             for (NamedApiResource namedApiResource : namedApiResourceList.getResults()) {
-                result.add(new Pokemon(namedApiResource.getId(), namedApiResource.getName()));
+                String[] segments = namedApiResource.getUrl().split("/");
+                String idStr = segments[segments.length-1];
+                int id = Integer.parseInt(idStr);
+                result.add(new Pokemon(id,
+                        namedApiResource.getUrl(),
+                        namedApiResource.getName(),
+                        0, 0, 0));
             }
             return result;
         });
+
     }
 
     @Override
@@ -44,13 +44,4 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource {
         return apiProvider.getPokemonApi().getPokemon(id);
     }
 
-    @Override
-    public void savePokemon(@NonNull Pokemon pokemon) {
-        //do nothing
-    }
-
-    @Override
-    public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        //do nothing
-    }
 }

@@ -10,12 +10,10 @@ public abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    @Local
-    abstract PokemonsDataSource provideLocalDataSource(PokemonsLocalDataSource localDataSource);
+    abstract PokemonsDataSource.Local provideLocalDataSource(PokemonsLocalDataSource localDataSource);
 
     @Singleton
     @Binds
-    @Remote
-    abstract PokemonsDataSource provideRemoteDataSource(PokemonsRemoteDataSource remoteDataSource);
+    abstract PokemonsDataSource.Remote provideRemoteDataSource(PokemonsRemoteDataSource remoteDataSource);
 
 }

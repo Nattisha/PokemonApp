@@ -15,7 +15,9 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import dagger.android.support.DaggerApplication;
 
 @Singleton
-@Component(modules = {NetworkModule.class,
+@Component(modules = {
+        AppModule.class,
+        NetworkModule.class,
         RepositoryModule.class,
         ActivityBindingModule.class,
         AndroidSupportInjectionModule.class})

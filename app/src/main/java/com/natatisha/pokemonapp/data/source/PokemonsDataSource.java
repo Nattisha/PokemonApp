@@ -10,15 +10,24 @@ import io.reactivex.Observable;
 
 public interface PokemonsDataSource {
 
-    int PAGE_SIZE = 30;
+    interface Local {
 
-    void refreshData();
+        Observable<List<Pokemon>> getPokemonsList();
 
-    Observable<List<Pokemon>> getPokemonsList(int page);
+        Observable<Pokemon> getPokemon(int id);
 
-    Observable<Pokemon> getPokemon(int id);
+        void savePokemon(@NonNull Pokemon pokemon);
 
-    void savePokemon(@NonNull Pokemon pokemon);
+        void savePokemonsList(@NonNull List<Pokemon> pokemonList);
 
-    void savePokemonsList(@NonNull List<Pokemon> pokemonList);
+    }
+
+    interface Remote {
+
+        Observable<List<Pokemon>> getPokemonsList(int offset, int limit);
+
+        Observable<Pokemon> getPokemon(int id);
+
+    }
+
 }
