@@ -1,5 +1,8 @@
 package com.natatisha.pokemonapp.data.source;
 
+import com.natatisha.pokemonapp.data.source.sqlite.PokemonsDatabaseHelper;
+import com.natatisha.pokemonapp.data.source.sqlite.SQLitePokemonsDataBaseHelper;
+
 import javax.inject.Singleton;
 
 import dagger.Binds;
@@ -7,6 +10,9 @@ import dagger.Module;
 
 @Module
 public abstract class RepositoryModule {
+
+    @Binds
+    abstract PokemonsDatabaseHelper provideDataBaseHelper(SQLitePokemonsDataBaseHelper helper);
 
     @Singleton
     @Binds

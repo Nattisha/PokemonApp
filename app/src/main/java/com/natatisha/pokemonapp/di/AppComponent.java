@@ -4,7 +4,6 @@ import android.app.Application;
 
 import com.natatisha.pokemonapp.PokemonApp;
 import com.natatisha.pokemonapp.data.source.RepositoryModule;
-import com.natatisha.pokemonapp.network.NetworkModule;
 
 import javax.inject.Singleton;
 
@@ -17,7 +16,6 @@ import dagger.android.support.DaggerApplication;
 @Singleton
 @Component(modules = {
         AppModule.class,
-        NetworkModule.class,
         RepositoryModule.class,
         ActivityBindingModule.class,
         AndroidSupportInjectionModule.class})
