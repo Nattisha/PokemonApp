@@ -1,27 +1,22 @@
 package com.natatisha.pokemonapp.data.model
 
 data class Pokemon(
-        val id: Int,
-        val name: String) {
-    constructor(
-            id: Int,
-            name: String,
-            baseExperience: Int,
-            height: Int,
-            isDefault: Boolean,
-            order: Int,
-            weight: Int,
-            species: NamedApiResource,
-            abilities: List<PokemonAbility>,
-            forms: List<NamedApiResource>,
-            heldItems: List<PokemonHeldItem>,
-            moves: List<PokemonMove>,
-            stats: List<PokemonStat>,
-            types: List<PokemonType>,
-            sprites: PokemonSprites) : this(id, name) {
-
-    }
-}
+        val id: Int = 0,
+        val url: String = "azaza",
+        val name: String = "",
+        val baseExperience: Int = 0,
+        val weight: Int = 0,
+        val height: Int = 0/*,
+        val isDefault: Boolean,
+        val order: Int,
+        val species: NamedApiResource,
+        val abilities: List<PokemonAbility>,
+        val forms: List<NamedApiResource>,
+        val heldItems: List<PokemonHeldItem>,
+        val moves: List<PokemonMove>,
+        val stats: List<PokemonStat>,
+        val sprites: PokemonSprites,
+        val types: List<PokemonType>*/)
 
 data class PokemonAbility(
         val isHidden: Boolean,
