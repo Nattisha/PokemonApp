@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PokemonApiProvider {
 
-    public static final String API_URL = "http://pokeapi.co/api/v2/";
+    private static final String API_URL = "http://pokeapi.co/api/v2/";
 
     private Retrofit.Builder mBuilder;
 

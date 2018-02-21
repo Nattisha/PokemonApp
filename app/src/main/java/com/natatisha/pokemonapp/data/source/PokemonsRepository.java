@@ -14,17 +14,17 @@ public class PokemonsRepository {
 
     private static final int PAGE_SIZE = 30;
 
-    private PokemonsDataSource.Local mLocalDataSource;
+    private PokemonsDataSource.Local localDataSource;
 
-    private PokemonsDataSource.Remote mRemoteDataSource;
+    private PokemonsDataSource.Remote remoteDataSource;
 
     private boolean cacheIsDirty = true;
 
     @Inject
     public PokemonsRepository(@NonNull PokemonsDataSource.Local localDataSource,
                               @NonNull PokemonsDataSource.Remote remoteDataSource) {
-        this.mLocalDataSource = localDataSource;
-        this.mRemoteDataSource = remoteDataSource;
+        this.localDataSource = localDataSource;
+        this.remoteDataSource = remoteDataSource;
     }
 
     public void refreshData() {
@@ -33,25 +33,25 @@ public class PokemonsRepository {
 
     public Observable<List<Pokemon>> getPokemonsList(int page) {
         if (cacheIsDirty) {
-            return mRemoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE).
-                    doOnNext(pokemonList -> mLocalDataSource.savePokemonsList(pokemonList));
+            return remoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE).
+                    doOnNext(pokemonList -> localDataSource.savePokemonsList(pokemonList));
         }
-        return mLocalDataSource.getPokemonsList();
+        return localDataSource.getPokemonsList();
     }
 
     public Observable<Pokemon> getPokemon(int id) {
         if (cacheIsDirty) {
-            return mRemoteDataSource.getPokemon(id).
-                    doOnNext(pokemon -> mLocalDataSource.savePokemon(pokemon));
+            return remoteDataSource.getPokemon(id).
+                    doOnNext(pokemon -> localDataSource.savePokemon(pokemon));
         }
-        return mLocalDataSource.getPokemon(id);
+        return localDataSource.getPokemon(id);
     }
 
     public void savePokemon(@NonNull Pokemon pokemon) {
-        mLocalDataSource.savePokemon(pokemon);
+        localDataSource.savePokemon(pokemon);
     }
 
     public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        mLocalDataSource.savePokemonsList(pokemonList);
+        localDataSource.savePokemonsList(pokemonList);
     }
 }
