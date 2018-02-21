@@ -24,6 +24,8 @@ public interface PokemonsDatabaseHelper {
 
     boolean isPokemonExists(int id);
 
+    boolean hasFullInfo(int id);
+
     void deleteAll();
 
     int getPokemonsCount();
