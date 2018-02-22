@@ -35,7 +35,7 @@ public class PokemonsRecyclerAdapter extends RecyclerView.Adapter<PokemonsRecycl
     public PokemonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         PokemonViewHolder holder = new PokemonViewHolder(LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.pokemon_list_item, parent, false));
-        holder.itemView.setOnClickListener(view -> clickListener.onClick(pokemonsList.get(holder.getAdapterPosition()).getId()));
+        holder.itemView.setOnClickListener(view -> clickListener.onClick(pokemonsList.get(holder.getAdapterPosition())));
         return holder;
     }
 

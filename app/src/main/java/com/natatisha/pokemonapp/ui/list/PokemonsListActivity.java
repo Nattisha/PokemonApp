@@ -24,6 +24,7 @@ import dagger.android.support.DaggerAppCompatActivity;
 import static com.natatisha.pokemonapp.utils.Constants.IS_LOADING_KEY;
 import static com.natatisha.pokemonapp.utils.Constants.IS_SNACK_BAR_SHOWING_KEY;
 import static com.natatisha.pokemonapp.utils.Constants.POKEMON_ID_KEY;
+import static com.natatisha.pokemonapp.utils.Constants.POKEMON_NAME_KEY;
 
 public class PokemonsListActivity extends DaggerAppCompatActivity implements PokemonsListContract.View {
 
@@ -64,14 +65,15 @@ public class PokemonsListActivity extends DaggerAppCompatActivity implements Pok
 
     private PokemonClickListener pokemonClickListener = new PokemonClickListener() {
         @Override
-        public void onClick(int id) {
-            showPokemonInfoScreen(id);
+        public void onClick(Pokemon pokemon) {
+            showPokemonInfoScreen(pokemon);
         }
     };
 
-    private void showPokemonInfoScreen(int id) {
+    private void showPokemonInfoScreen(Pokemon pokemon) {
         Intent intent = new Intent(this, PokemonInfoActivity.class);
-        intent.putExtra(POKEMON_ID_KEY, id);
+        intent.putExtra(POKEMON_ID_KEY, pokemon.getId());
+        intent.putExtra(POKEMON_NAME_KEY, pokemon.getName());
         startActivity(intent);
     }
 

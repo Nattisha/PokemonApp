@@ -18,6 +18,7 @@ import butterknife.ButterKnife;
 import dagger.android.support.DaggerAppCompatActivity;
 
 import static com.natatisha.pokemonapp.utils.Constants.POKEMON_ID_KEY;
+import static com.natatisha.pokemonapp.utils.Constants.POKEMON_NAME_KEY;
 
 public class PokemonInfoActivity extends DaggerAppCompatActivity implements PokemonInfoContract.View {
 
@@ -36,18 +37,19 @@ public class PokemonInfoActivity extends DaggerAppCompatActivity implements Poke
     @BindView(R.id.exp_tv)
     TextView experienceTv;
 
-    private int pokemonId;
-
     @Inject
     PokemonInfoContract.Presenter presenter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getIntent() != null) {
-            pokemonId = getIntent().getIntExtra(POKEMON_ID_KEY, 0);
-        }
+        if (getIntent() == null)
+            finish();
+
+        int pokemonId = getIntent().getIntExtra(POKEMON_ID_KEY, 0);
+        String pokemonName = getIntent().getStringExtra(POKEMON_NAME_KEY);
         setContentView(R.layout.pokemon_info_layout);
+        getSupportActionBar().setTitle(pokemonName);
         ButterKnife.bind(this);
         presenter.bind(this);
         presenter.loadPokemon(pokemonId);
