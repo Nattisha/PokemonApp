@@ -5,9 +5,7 @@ import android.support.annotation.NonNull;
 import com.natatisha.pokemonapp.data.model.Pokemon;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public interface PokemonsDataSource {
@@ -18,9 +16,9 @@ public interface PokemonsDataSource {
 
         Observable<Pokemon> getPokemon(int id);
 
-        Completable savePokemon(@NonNull Pokemon pokemon);
+        void savePokemon(@NonNull Pokemon pokemon);
 
-        Completable savePokemonsList(@NonNull List<Pokemon> pokemonList);
+        void savePokemonsList(@NonNull List<Pokemon> pokemonList);
 
         boolean hasPokemon(int id);
 

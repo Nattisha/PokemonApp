@@ -72,6 +72,6 @@ public class PokemonInfoActivity extends DaggerAppCompatActivity implements Poke
 
     @Override
     public void showPokemonLoadError() {
-
+        finish();
     }
 }

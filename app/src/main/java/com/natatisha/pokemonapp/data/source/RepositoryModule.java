@@ -11,6 +11,7 @@ import dagger.Module;
 @Module
 public abstract class RepositoryModule {
 
+    @Singleton
     @Binds
     abstract PokemonsDatabaseHelper provideDataBaseHelper(SQLitePokemonsDataBaseHelper helper);
 

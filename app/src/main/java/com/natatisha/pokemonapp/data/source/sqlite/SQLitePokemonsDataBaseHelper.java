@@ -70,13 +70,11 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     @Override
     public void addPokemons(@NonNull List<Pokemon> pokemons) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String rawQuery = insertPokemonQuery() + " VALUES ";
         for (int i = 0; i < pokemons.size(); i++) {
-            boolean isLast = i == pokemons.size() - 1;
-            rawQuery = rawQuery.concat(getPokemonContentValuesStr(pokemons.get(i))).concat(isLast ? ";" : ",");
+            ContentValues values = getPokemonContentValues(pokemons.get(i));
+            db.insert(POKEMONS_TABLE, null, values);
         }
-        Cursor cursor = db.rawQuery(rawQuery, null);
-        cursor.close();
+        db.close();
     }
 
     @Override
@@ -169,10 +167,10 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     @Override
     public boolean isPokemonExists(int id) {
         String selectQuery = String.format(Locale.US,
-                "SELECT * FROM %s WHERE %s =%d", POKEMONS_TABLE, KEY_POKEMON_ID, id);
+                "SELECT * FROM %s WHERE %s =?", POKEMONS_TABLE, KEY_POKEMON_ID);
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        boolean exists = cursor.getCount() <= 0;
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{String.valueOf(id)});
+        boolean exists = cursor.moveToFirst();
         cursor.close();
         return exists;
     }
@@ -180,7 +178,7 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     @Override
     public boolean hasFullInfo(int id) {
         Pokemon pokemon = getPokemon(id);
-        return pokemon.getHeight() >= 0 && pokemon.getWeight() >= 0 && pokemon.getBaseExperience() >= 0;
+        return pokemon.getSprites().getBackDefault() != null && !pokemon.getSprites().getBackDefault().isEmpty();
     }
 
     //<editor-fold desc="utils methods">
@@ -197,7 +195,7 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     }
 
     private String insertPokemonQuery() {
-        return String.format("INSERT INTO %s(%s, %s, %s, %s, %s, %s)",
+        return String.format("INSERT INTO %s(%s, %s, %s, %s, %s, %s, %s)",
                 POKEMONS_TABLE,
                 KEY_POKEMON_ID,
                 KEY_POKEMON_NAME,
@@ -215,8 +213,8 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
                 toSQLStr(pokemon.getName()),
                 pokemon.getWeight(),
                 pokemon.getHeight(),
-                toSQLStr(pokemon.getSprites().getBackDefault()),
-                toSQLStr(pokemon.getSprites().getFrontDefault()),
+                toSQLStr(pokemon.getSprites().getBackDefault() == null ? "" : pokemon.getSprites().getBackDefault()),
+                toSQLStr(pokemon.getSprites().getFrontDefault() == null ? "" : pokemon.getSprites().getFrontDefault()),
                 pokemon.getBaseExperience());
     }
 
@@ -227,8 +225,8 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
         values.put(KEY_POKEMON_NAME, pokemon.getName());
         values.put(KEY_POKEMON_WEIGHT, pokemon.getWeight());
         values.put(KEY_POKEMON_HEIGHT, pokemon.getHeight());
-        values.put(KEY_POKEMON_BACK, pokemon.getSprites().getBackDefault());
-        values.put(KEY_POKEMON_FRONT, pokemon.getSprites().getFrontDefault());
+        values.put(KEY_POKEMON_BACK, pokemon.getSprites().getBackDefault() == null ? "" : pokemon.getSprites().getBackDefault());
+        values.put(KEY_POKEMON_FRONT, pokemon.getSprites().getFrontDefault() == null ? "" : pokemon.getSprites().getFrontDefault());
         values.put(KEY_POKEMON_EXPERIENCE, pokemon.getBaseExperience());
         return values;
     }

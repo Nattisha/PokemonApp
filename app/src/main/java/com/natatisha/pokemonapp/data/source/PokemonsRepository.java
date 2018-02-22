@@ -38,21 +38,34 @@ public class PokemonsRepository {
     public Observable<List<Pokemon>> getPokemonsList(int page) {
         if (cacheIsDirty) {
             return remoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE).
-                    doOnNext(pokemonList -> localDataSource.savePokemonsList(pokemonList).
-                            doOnComplete(() -> cacheIsDirty = false));
-        } else {
-            return localDataSource.getPokemonsList();
+                    map(pokemonList -> {
+                        Observable.create(subscriber -> {
+                            localDataSource.savePokemonsList(pokemonList);
+                            cacheIsDirty = false;
+                            isLoading = false;
+                            subscriber.onComplete();
+                        }).subscribe();
+                        return pokemonList;
+                    });
         }
+        return localDataSource.getPokemonsList();
     }
 
     public Observable<Pokemon> getPokemon(int id) {
         isLoading = true;
-        if (cacheIsDirty || !localDataSource.hasPokemon(id)) {
+        if (!localDataSource.hasPokemon(id)) {
             return remoteDataSource.getPokemon(id).
-                    doOnNext(pokemon -> localDataSource.savePokemon(pokemon)).
-                    doOnComplete(() -> isLoading = false);
+                    map(pokemon -> {
+                        Observable.create(subscriber -> {
+                            localDataSource.savePokemon(pokemon);
+                            isLoading = false;
+                            subscriber.onComplete();
+                        }).subscribe();
+                        return pokemon;
+                    });
+        } else {
+            return localDataSource.getPokemon(id).doOnComplete(() -> isLoading = false);
         }
-        return localDataSource.getPokemon(id).doOnComplete(() -> isLoading = false);
     }
 
     public int getCacheSize() {

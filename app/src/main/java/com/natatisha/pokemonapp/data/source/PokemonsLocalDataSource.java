@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
@@ -32,13 +31,18 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
     }
 
     @Override
-    public Completable savePokemon(@NonNull Pokemon pokemon) {
-        return Completable.fromRunnable(() -> pokemonsDatabaseHelper.addPokemon(pokemon));
+    public void savePokemon(@NonNull Pokemon pokemon) {
+        if (pokemonsDatabaseHelper.isPokemonExists(pokemon.getId())) {
+            pokemonsDatabaseHelper.updatePokemon(pokemon);
+        } else {
+            pokemonsDatabaseHelper.addPokemon(pokemon);
+        }
     }
 
     @Override
-    public Completable savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        return Completable.fromRunnable(() -> pokemonsDatabaseHelper.addPokemons(pokemonList));
+    public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
+        pokemonsDatabaseHelper.deleteAll();
+        pokemonsDatabaseHelper.addPokemons(pokemonList);
     }
 
     @Override

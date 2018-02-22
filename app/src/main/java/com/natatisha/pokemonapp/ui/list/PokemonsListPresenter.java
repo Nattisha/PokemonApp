@@ -1,7 +1,6 @@
 package com.natatisha.pokemonapp.ui.list;
 
 import com.natatisha.pokemonapp.data.source.PokemonsRepository;
-import com.natatisha.pokemonapp.ui.list.PokemonsListContract;
 import com.natatisha.pokemonapp.utils.RxUtils;
 
 import javax.inject.Inject;
@@ -25,11 +24,12 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
     @Override
     public void bind(PokemonsListContract.View view) {
         this.view = view;
+        loadData(repository.getCacheSize() == 0);
     }
 
     @Override
     public void loadData(boolean forceRefresh) {
-//        if (repository.isLoading()) return;
+        view.showProgress(true);
         if (forceRefresh) {
             repository.refreshData();
         }
@@ -46,7 +46,6 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
 
     @Override
     public void unbind() {
-        disposable.clear();
         disposable.dispose();
     }
 }

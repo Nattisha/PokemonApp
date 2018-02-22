@@ -7,6 +7,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.natatisha.pokemonapp.R;
 import com.natatisha.pokemonapp.data.model.Pokemon;
@@ -40,17 +42,15 @@ public class PokemonsListActivity extends DaggerAppCompatActivity implements Pok
     RecyclerView pokemonsRecycler;
 
     private boolean isSnackBarShowing;
+    private boolean isLoading;
 
     private PokemonsRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            initView();
-            presenter.bind(this);
-            presenter.loadData(savedInstanceState == null);
-        }
+        initView();
+        presenter.bind(this);
     }
 
     private void initView() {
@@ -59,8 +59,8 @@ public class PokemonsListActivity extends DaggerAppCompatActivity implements Pok
         adapter = new PokemonsRecyclerAdapter(new ArrayList<>(), pokemonClickListener);
         pokemonsRecycler.setAdapter(adapter);
         pokemonsRecycler.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
+        refreshLayout.setRefreshing(isLoading);
 //        refreshLayout.setOnRefreshListener(() -> presenter.loadData(true));
-        showErrorSnackBar();
     }
 
     private PokemonClickListener pokemonClickListener = new PokemonClickListener() {
@@ -79,7 +79,17 @@ public class PokemonsListActivity extends DaggerAppCompatActivity implements Pok
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.pokemons_list_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_refresh) {
+            presenter.loadData(true);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -93,7 +103,7 @@ public class PokemonsListActivity extends DaggerAppCompatActivity implements Pok
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
-            refreshLayout.setRefreshing(savedInstanceState.getBoolean(IS_LOADING_KEY));
+            isLoading = savedInstanceState.getBoolean(IS_LOADING_KEY);
             if (savedInstanceState.getBoolean(IS_SNACK_BAR_SHOWING_KEY)) {
                 showErrorSnackBar();
             }
