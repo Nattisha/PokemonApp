@@ -1,8 +1,11 @@
 package com.natatisha.pokemonapp.data.source;
 
+import android.support.annotation.NonNull;
+
 import com.natatisha.pokemonapp.data.model.NamedApiResource;
 import com.natatisha.pokemonapp.data.model.Pokemon;
-import com.natatisha.pokemonapp.network.PokemonApiProvider;
+import com.natatisha.pokemonapp.data.model.PokemonSprites;
+import com.natatisha.pokemonapp.network.PokemonApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,35 +16,40 @@ import io.reactivex.Observable;
 
 public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
 
-    private PokemonApiProvider apiProvider;
+    private PokemonApi pokemonApi;
 
     @Inject
-    public PokemonsRemoteDataSource(PokemonApiProvider apiProvider) {
-        this.apiProvider = apiProvider;
+    public PokemonsRemoteDataSource(PokemonApi api) {
+        this.pokemonApi = api;
     }
 
     @Override
     public Observable<List<Pokemon>> getPokemonsList(int offset, int limit) {
-        return apiProvider.getPokemonApi().
+        return pokemonApi.
                 getPokemonList(offset, limit).map(namedApiResourceList -> {
             List<Pokemon> result = new ArrayList<>();
             for (NamedApiResource namedApiResource : namedApiResourceList.getResults()) {
                 String[] segments = namedApiResource.getUrl().split("/");
-                String idStr = segments[segments.length-1];
+                String idStr = segments[segments.length - 1];
                 int id = Integer.parseInt(idStr);
-                result.add(new Pokemon(id,
-                        namedApiResource.getUrl(),
-                        namedApiResource.getName(),
-                        0, 0, 0));
+                result.add(getDefaultPokemon(namedApiResource.getName(), id));
             }
             return result;
-        });
+        }).onErrorReturn(throwable -> new ArrayList<>());
 
+    }
+
+    @NonNull
+    private Pokemon getDefaultPokemon(String name, int id) {
+        return new Pokemon(id,
+                name,
+                0, 0, 0, new PokemonSprites(null, null));
     }
 
     @Override
     public Observable<Pokemon> getPokemon(int id) {
-        return apiProvider.getPokemonApi().getPokemon(id);
+        return pokemonApi.getPokemon(id).
+                onErrorReturn(throwable -> getDefaultPokemon("azazaz", id));
     }
 
 }
