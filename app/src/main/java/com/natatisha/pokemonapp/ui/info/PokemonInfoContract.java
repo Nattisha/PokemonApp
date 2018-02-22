@@ -1,7 +1,5 @@
 package com.natatisha.pokemonapp.ui.info;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
 import com.natatisha.pokemonapp.data.model.Pokemon;
@@ -13,6 +11,8 @@ public interface PokemonInfoContract {
         void showPokemon(@NonNull Pokemon pokemon);
 
         void showPokemonLoadError();
+
+        void showProgress(boolean active);
     }
 
     interface Presenter {

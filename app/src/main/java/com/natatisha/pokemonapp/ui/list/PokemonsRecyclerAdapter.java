@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.natatisha.pokemonapp.R;
@@ -35,13 +34,14 @@ public class PokemonsRecyclerAdapter extends RecyclerView.Adapter<PokemonsRecycl
     public PokemonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         PokemonViewHolder holder = new PokemonViewHolder(LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.pokemon_list_item, parent, false));
-        holder.itemView.setOnClickListener(view -> clickListener.onClick(pokemonsList.get(holder.getAdapterPosition())));
+        holder.container.setOnClickListener(view -> clickListener.onClick(pokemonsList.get(holder.getAdapterPosition())));
         return holder;
     }
 
     @Override
     public void onBindViewHolder(PokemonViewHolder holder, int position) {
-        holder.pokemonNameTv.setText(pokemonsList.get(position).getName());
+        String name = pokemonsList.get(position).getName().substring(0, 1).toUpperCase() + pokemonsList.get(position).getName().substring(1);
+        holder.pokemonNameTv.setText(name);
     }
 
     @Override
@@ -51,11 +51,11 @@ public class PokemonsRecyclerAdapter extends RecyclerView.Adapter<PokemonsRecycl
 
     class PokemonViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.pokemonIv)
-        ImageView pokemonIv;
-
         @BindView(R.id.pokemonNameTv)
         TextView pokemonNameTv;
+
+        @BindView(R.id.pokemonCv)
+        ViewGroup container;
 
         PokemonViewHolder(View itemView) {
             super(itemView);

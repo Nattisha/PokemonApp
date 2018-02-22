@@ -25,9 +25,19 @@ public class PokemonInfoPresenter implements PokemonInfoContract.Presenter {
 
     @Override
     public void loadPokemon(int id) {
+        if (repository.isLoading())
+            return;
+
+        view.showProgress(true);
         compositeDisposable.add(RxUtils.wrapAsync(repository.getPokemon(id)).
-                doOnError(throwable -> view.showPokemonLoadError()).
-                subscribe(pokemon -> view.showPokemon(pokemon)));
+                doOnError(throwable -> {
+                    view.showProgress(false);
+                    view.showPokemonLoadError();
+                }).
+                subscribe(pokemon -> {
+                    view.showProgress(false);
+                    view.showPokemon(pokemon);
+                }));
     }
 
     @Override

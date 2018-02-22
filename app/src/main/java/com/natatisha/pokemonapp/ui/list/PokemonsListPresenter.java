@@ -30,6 +30,9 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
     @Override
     public void loadData(boolean forceRefresh) {
         view.showProgress(true);
+        if (repository.isLoading())
+            return;
+
         if (forceRefresh) {
             repository.refreshData();
         }
@@ -46,6 +49,7 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
 
     @Override
     public void unbind() {
+        disposable.clear();
         disposable.dispose();
     }
 }

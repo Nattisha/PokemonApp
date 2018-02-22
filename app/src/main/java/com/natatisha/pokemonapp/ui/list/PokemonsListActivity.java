@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,17 +57,11 @@ public class PokemonsListActivity extends DaggerAppCompatActivity implements Pok
         ButterKnife.bind(this);
         adapter = new PokemonsRecyclerAdapter(new ArrayList<>(), pokemonClickListener);
         pokemonsRecycler.setAdapter(adapter);
-        pokemonsRecycler.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
         refreshLayout.setRefreshing(isLoading);
-//        refreshLayout.setOnRefreshListener(() -> presenter.loadData(true));
+        refreshLayout.setOnRefreshListener(() -> presenter.loadData(true));
     }
 
-    private PokemonClickListener pokemonClickListener = new PokemonClickListener() {
-        @Override
-        public void onClick(Pokemon pokemon) {
-            showPokemonInfoScreen(pokemon);
-        }
-    };
+    private PokemonClickListener pokemonClickListener = this::showPokemonInfoScreen;
 
     private void showPokemonInfoScreen(Pokemon pokemon) {
         Intent intent = new Intent(this, PokemonInfoActivity.class);
