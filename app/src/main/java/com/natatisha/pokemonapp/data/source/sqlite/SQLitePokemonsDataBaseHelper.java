@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
 import com.natatisha.pokemonapp.data.model.Pokemon;
+import com.natatisha.pokemonapp.data.model.PokemonSprites;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,11 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
 
     private static final String POKEMONS_TABLE = "pokemons";
     private static final String KEY_POKEMON_ID = "pokemon_id";
-    private static final String KEY_POKEMON_URL = "pokemon_url";
     private static final String KEY_POKEMON_NAME = "pokemon_name";
     private static final String KEY_POKEMON_WEIGHT = "pokemon_weight";
     private static final String KEY_POKEMON_HEIGHT = "pokemon_height";
+    private static final String KEY_POKEMON_BACK = "pokemon_back_icon";
+    private static final String KEY_POKEMON_FRONT = "pokemon_front_icon";
     private static final String KEY_POKEMON_EXPERIENCE = "pokemon_experience";
 
     @Inject
@@ -41,10 +43,11 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String CREATE_POKEMONS_TABLE = "CREATE TABLE " + POKEMONS_TABLE + "("
                 + KEY_POKEMON_ID + " INTEGER PRIMARY KEY,"
-                + KEY_POKEMON_URL + " TEXT,"
                 + KEY_POKEMON_NAME + " TEXT,"
                 + KEY_POKEMON_HEIGHT + " INTEGER,"
                 + KEY_POKEMON_WEIGHT + " INTEGER,"
+                + KEY_POKEMON_BACK + " TEXT,"
+                + KEY_POKEMON_FRONT + " TEXT,"
                 + KEY_POKEMON_EXPERIENCE + " INTEGER" + ")";
         sqLiteDatabase.execSQL(CREATE_POKEMONS_TABLE);
     }
@@ -113,14 +116,15 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(POKEMONS_TABLE, new String[]{
                         KEY_POKEMON_ID,
-                        KEY_POKEMON_URL,
                         KEY_POKEMON_NAME,
                         KEY_POKEMON_WEIGHT,
                         KEY_POKEMON_HEIGHT,
+                        KEY_POKEMON_BACK,
+                        KEY_POKEMON_FRONT,
                         KEY_POKEMON_EXPERIENCE}, KEY_POKEMON_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
 
-        Pokemon pokemon = new Pokemon();
+        Pokemon pokemon = getDefaultPokemon("azaza", id);
         if (cursor != null && cursor.moveToFirst()) {
             pokemon = getPokemonFromCursor(cursor);
             cursor.close();
@@ -184,32 +188,35 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     @NonNull
     private Pokemon getPokemonFromCursor(Cursor cursor) {
         return new Pokemon(cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_ID)),
-                cursor.getString(cursor.getColumnIndex(KEY_POKEMON_URL)),
                 cursor.getString(cursor.getColumnIndex(KEY_POKEMON_NAME)),
+                cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_EXPERIENCE)),
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_WEIGHT)),
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_HEIGHT)),
-                cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_EXPERIENCE)));
+                new PokemonSprites(cursor.getString(cursor.getColumnIndex(KEY_POKEMON_BACK)),
+                        cursor.getString(cursor.getColumnIndex(KEY_POKEMON_FRONT))));
     }
 
     private String insertPokemonQuery() {
         return String.format("INSERT INTO %s(%s, %s, %s, %s, %s, %s)",
                 POKEMONS_TABLE,
                 KEY_POKEMON_ID,
-                KEY_POKEMON_URL,
                 KEY_POKEMON_NAME,
                 KEY_POKEMON_WEIGHT,
                 KEY_POKEMON_HEIGHT,
+                KEY_POKEMON_BACK,
+                KEY_POKEMON_FRONT,
                 KEY_POKEMON_EXPERIENCE);
     }
 
     private String getPokemonContentValuesStr(@NonNull Pokemon pokemon) {
         return String.format(Locale.US,
-                "(%d, %s, %s, %d, %d, %d)",
+                "(%d, %s, %d, %d, %s, %s, %d)",
                 pokemon.getId(),
-                toSQLStr(pokemon.getUrl()),
                 toSQLStr(pokemon.getName()),
                 pokemon.getWeight(),
                 pokemon.getHeight(),
+                toSQLStr(pokemon.getSprites().getBackDefault()),
+                toSQLStr(pokemon.getSprites().getFrontDefault()),
                 pokemon.getBaseExperience());
     }
 
@@ -217,16 +224,23 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     private ContentValues getPokemonContentValues(@NonNull Pokemon pokemon) {
         ContentValues values = new ContentValues();
         values.put(KEY_POKEMON_ID, pokemon.getId());
-        values.put(KEY_POKEMON_URL, pokemon.getUrl());
         values.put(KEY_POKEMON_NAME, pokemon.getName());
         values.put(KEY_POKEMON_WEIGHT, pokemon.getWeight());
         values.put(KEY_POKEMON_HEIGHT, pokemon.getHeight());
+        values.put(KEY_POKEMON_BACK, pokemon.getSprites().getBackDefault());
+        values.put(KEY_POKEMON_FRONT, pokemon.getSprites().getFrontDefault());
         values.put(KEY_POKEMON_EXPERIENCE, pokemon.getBaseExperience());
         return values;
     }
 
     private String toSQLStr(String inputStr) {
         return "'".concat(inputStr).concat("'");
+    }
+
+    private Pokemon getDefaultPokemon(String name, int id) {
+        return new Pokemon(id,
+                name,
+                0, 0, 0, new PokemonSprites(null, null));
     }
 
     //</editor-fold>

@@ -7,9 +7,11 @@ import com.natatisha.pokemonapp.data.model.Pokemon;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Observable;
 
+@Singleton
 public class PokemonsRepository {
 
     private static final int PAGE_SIZE = 30;
@@ -18,7 +20,9 @@ public class PokemonsRepository {
 
     private PokemonsDataSource.Remote remoteDataSource;
 
-    private boolean cacheIsDirty = true;
+    private boolean cacheIsDirty = false;
+
+    private boolean isLoading = false;
 
     @Inject
     public PokemonsRepository(@NonNull PokemonsDataSource.Local localDataSource,
@@ -34,24 +38,28 @@ public class PokemonsRepository {
     public Observable<List<Pokemon>> getPokemonsList(int page) {
         if (cacheIsDirty) {
             return remoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE).
-                    doOnNext(pokemonList -> localDataSource.savePokemonsList(pokemonList));
+                    doOnNext(pokemonList -> localDataSource.savePokemonsList(pokemonList).
+                            doOnComplete(() -> cacheIsDirty = false));
+        } else {
+            return localDataSource.getPokemonsList();
         }
-        return localDataSource.getPokemonsList();
     }
 
     public Observable<Pokemon> getPokemon(int id) {
-        if (cacheIsDirty) {
+        isLoading = true;
+        if (cacheIsDirty || !localDataSource.hasPokemon(id)) {
             return remoteDataSource.getPokemon(id).
-                    doOnNext(pokemon -> localDataSource.savePokemon(pokemon));
+                    doOnNext(pokemon -> localDataSource.savePokemon(pokemon)).
+                    doOnComplete(() -> isLoading = false);
         }
-        return localDataSource.getPokemon(id);
+        return localDataSource.getPokemon(id).doOnComplete(() -> isLoading = false);
     }
 
-    public void savePokemon(@NonNull Pokemon pokemon) {
-        localDataSource.savePokemon(pokemon);
+    public int getCacheSize() {
+        return localDataSource.getCacheSize();
     }
 
-    public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        localDataSource.savePokemonsList(pokemonList);
+    public boolean isLoading() {
+        return isLoading;
     }
 }
