@@ -194,30 +194,6 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
                         cursor.getString(cursor.getColumnIndex(KEY_POKEMON_FRONT))));
     }
 
-    private String insertPokemonQuery() {
-        return String.format("INSERT INTO %s(%s, %s, %s, %s, %s, %s, %s)",
-                POKEMONS_TABLE,
-                KEY_POKEMON_ID,
-                KEY_POKEMON_NAME,
-                KEY_POKEMON_WEIGHT,
-                KEY_POKEMON_HEIGHT,
-                KEY_POKEMON_BACK,
-                KEY_POKEMON_FRONT,
-                KEY_POKEMON_EXPERIENCE);
-    }
-
-    private String getPokemonContentValuesStr(@NonNull Pokemon pokemon) {
-        return String.format(Locale.US,
-                "(%d, %s, %d, %d, %s, %s, %d)",
-                pokemon.getId(),
-                toSQLStr(pokemon.getName()),
-                pokemon.getWeight(),
-                pokemon.getHeight(),
-                toSQLStr(pokemon.getSprites().getBackDefault() == null ? "" : pokemon.getSprites().getBackDefault()),
-                toSQLStr(pokemon.getSprites().getFrontDefault() == null ? "" : pokemon.getSprites().getFrontDefault()),
-                pokemon.getBaseExperience());
-    }
-
     @NonNull
     private ContentValues getPokemonContentValues(@NonNull Pokemon pokemon) {
         ContentValues values = new ContentValues();
@@ -229,10 +205,6 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
         values.put(KEY_POKEMON_FRONT, pokemon.getSprites().getFrontDefault() == null ? "" : pokemon.getSprites().getFrontDefault());
         values.put(KEY_POKEMON_EXPERIENCE, pokemon.getBaseExperience());
         return values;
-    }
-
-    private String toSQLStr(String inputStr) {
-        return "'".concat(inputStr).concat("'");
     }
 
     private Pokemon getDefaultPokemon(String name, int id) {
