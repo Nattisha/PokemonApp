@@ -10,11 +10,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+
+import static com.natatisha.pokemonapp.utils.Constants.PAGE_SIZE;
 
 @Singleton
 public class PokemonsRepository {
-
-    private static final int PAGE_SIZE = 30;
 
     private PokemonsDataSource.Local localDataSource;
 
@@ -42,13 +43,12 @@ public class PokemonsRepository {
                         Observable.create(subscriber -> {
                             localDataSource.savePokemonsList(pokemonList);
                             cacheIsDirty = false;
-                            isLoading = false;
-                            subscriber.onComplete();
+                            setLoadingCompleted(subscriber);
                         }).subscribe();
                         return pokemonList;
                     });
         }
-        return localDataSource.getPokemonsList();
+        return localDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE);
     }
 
     public Observable<Pokemon> getPokemon(int id) {
@@ -58,8 +58,7 @@ public class PokemonsRepository {
                     map(pokemon -> {
                         Observable.create(subscriber -> {
                             localDataSource.savePokemon(pokemon);
-                            isLoading = false;
-                            subscriber.onComplete();
+                            setLoadingCompleted(subscriber);
                         }).subscribe();
                         return pokemon;
                     });
@@ -68,11 +67,24 @@ public class PokemonsRepository {
         }
     }
 
+    private void setLoadingCompleted(ObservableEmitter<Object> subscriber) {
+        isLoading = false;
+        subscriber.onComplete();
+    }
+
     public int getCacheSize() {
         return localDataSource.getCacheSize();
     }
 
+    public int getPokemonsCount(){
+        return remoteDataSource.getItemsCount();
+    }
+
     public boolean isLoading() {
         return isLoading;
+    }
+
+    public void clearCache(){
+        localDataSource.deleteAll();
     }
 }

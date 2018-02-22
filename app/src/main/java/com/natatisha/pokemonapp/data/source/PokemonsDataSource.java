@@ -14,6 +14,8 @@ public interface PokemonsDataSource {
 
         Observable<List<Pokemon>> getPokemonsList();
 
+        Observable<List<Pokemon>> getPokemonsList(int offset, int limit);
+
         Observable<Pokemon> getPokemon(int id);
 
         void savePokemon(@NonNull Pokemon pokemon);
@@ -23,9 +25,13 @@ public interface PokemonsDataSource {
         boolean hasPokemon(int id);
 
         int getCacheSize();
+
+        void deleteAll();
     }
 
     interface Remote {
+
+        int getItemsCount();
 
         Observable<List<Pokemon>> getPokemonsList(int offset, int limit);
 

@@ -8,9 +8,13 @@ public interface PokemonsListContract {
 
     interface View {
 
+        void setEndOfList(boolean endOfList);
+
         void showProgress(boolean active);
 
         void displayPokemonsList(List<Pokemon> pokemonList);
+
+        void addPokemonsList(List<Pokemon> pokemonList);
 
         void showPokemonsLoadingError();
     }
@@ -19,7 +23,15 @@ public interface PokemonsListContract {
 
         void bind(View view);
 
+        int getCurrentPage();
+
+        void setCurrentPage(int page);
+
         void loadData(boolean forceRefresh);
+
+        void loadNextPage();
+
+        void refresh();
 
         void unbind();
 

@@ -72,7 +72,11 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
         SQLiteDatabase db = this.getWritableDatabase();
         for (int i = 0; i < pokemons.size(); i++) {
             ContentValues values = getPokemonContentValues(pokemons.get(i));
-            db.insert(POKEMONS_TABLE, null, values);
+            if (isPokemonExists(pokemons.get(i).getId())) {
+                db.update(POKEMONS_TABLE, values, KEY_POKEMON_ID + " = ?", new String[]{String.valueOf(pokemons.get(i).getId())});
+            } else {
+                db.insert(POKEMONS_TABLE, null, values);
+            }
         }
         db.close();
     }

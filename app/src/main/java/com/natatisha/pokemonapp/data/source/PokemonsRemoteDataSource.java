@@ -18,15 +18,23 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
 
     private PokemonApi pokemonApi;
 
+    private int itemsCount;
+
     @Inject
     public PokemonsRemoteDataSource(PokemonApi api) {
         this.pokemonApi = api;
     }
 
     @Override
+    public int getItemsCount() {
+        return itemsCount;
+    }
+
+    @Override
     public Observable<List<Pokemon>> getPokemonsList(int offset, int limit) {
         return pokemonApi.
                 getPokemonList(offset, limit).map(namedApiResourceList -> {
+            itemsCount = namedApiResourceList.getCount();
             List<Pokemon> result = new ArrayList<>();
             for (NamedApiResource namedApiResource : namedApiResourceList.getResults()) {
                 result.add(getDefaultPokemon(namedApiResource.getName(), namedApiResource.getId()));
@@ -40,7 +48,8 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
     private Pokemon getDefaultPokemon(String name, int id) {
         return new Pokemon(id,
                 name,
-                0, 0, 0, new PokemonSprites(null, null));
+                0, 0, 0,
+                new PokemonSprites(null, null));
     }
 
     @Override

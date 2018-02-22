@@ -30,6 +30,11 @@ public class PokemonsRecyclerAdapter extends RecyclerView.Adapter<PokemonsRecycl
         notifyDataSetChanged();
     }
 
+    public void addItemsToList(List<Pokemon> pokemonList) {
+        this.pokemonsList.addAll(pokemonList);
+        notifyDataSetChanged();
+    }
+
     @Override
     public PokemonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         PokemonViewHolder holder = new PokemonViewHolder(LayoutInflater.from(parent.getContext()).

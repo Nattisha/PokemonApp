@@ -26,6 +26,11 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
     }
 
     @Override
+    public Observable<List<Pokemon>> getPokemonsList(int offset, int limit) {
+        return Observable.just(pokemonsDatabaseHelper.getPokemonsList(offset, limit));
+    }
+
+    @Override
     public Observable<Pokemon> getPokemon(int id) {
         return Observable.just(pokemonsDatabaseHelper.getPokemon(id));
     }
@@ -41,7 +46,6 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
 
     @Override
     public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        pokemonsDatabaseHelper.deleteAll();
         pokemonsDatabaseHelper.addPokemons(pokemonList);
     }
 
@@ -53,5 +57,10 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
     @Override
     public int getCacheSize() {
         return pokemonsDatabaseHelper.getPokemonsCount();
+    }
+
+    @Override
+    public void deleteAll() {
+        pokemonsDatabaseHelper.deleteAll();
     }
 }

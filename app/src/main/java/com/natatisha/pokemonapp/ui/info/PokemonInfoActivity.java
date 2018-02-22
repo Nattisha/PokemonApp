@@ -54,7 +54,8 @@ public class PokemonInfoActivity extends DaggerAppCompatActivity implements Poke
             finish();
 
         int pokemonId = getIntent().getIntExtra(POKEMON_ID_KEY, 0);
-        String pokemonName = getIntent().getStringExtra(POKEMON_NAME_KEY);
+        String pokemonName = getIntent().getStringExtra(POKEMON_NAME_KEY).substring(0, 1).toUpperCase() +
+                getIntent().getStringExtra(POKEMON_NAME_KEY).substring(1);
         setContentView(R.layout.pokemon_info_layout);
         getSupportActionBar().setTitle(pokemonName);
         ButterKnife.bind(this);
@@ -89,6 +90,7 @@ public class PokemonInfoActivity extends DaggerAppCompatActivity implements Poke
         weightTv.setText(String.valueOf(pokemon.getWeight()));
         heightTv.setText(String.valueOf(pokemon.getHeight()));
         experienceTv.setText(String.valueOf(pokemon.getBaseExperience()));
+        //load icons here to avoid Context in presenter
         Picasso.with(this).load(pokemon.getSprites().getBackDefault()).into(backIv);
         Picasso.with(this).load(pokemon.getSprites().getFrontDefault()).into(frontIv);
     }

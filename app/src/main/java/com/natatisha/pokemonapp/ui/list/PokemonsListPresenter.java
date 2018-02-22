@@ -7,6 +7,8 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 
+import static com.natatisha.pokemonapp.utils.Constants.PAGE_SIZE;
+
 public class PokemonsListPresenter implements PokemonsListContract.Presenter {
 
     private PokemonsRepository repository;
@@ -14,6 +16,8 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
     private PokemonsListContract.View view;
 
     private CompositeDisposable disposable;
+
+    private int currentPage;
 
     @Inject
     public PokemonsListPresenter(PokemonsRepository repository) {
@@ -24,11 +28,41 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
     @Override
     public void bind(PokemonsListContract.View view) {
         this.view = view;
-        loadData(repository.getCacheSize() == 0);
+    }
+
+    @Override
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    @Override
+    public void setCurrentPage(int page) {
+        this.currentPage = page;
     }
 
     @Override
     public void loadData(boolean forceRefresh) {
+        loadPokemonsList(forceRefresh, false);
+    }
+
+    @Override
+    public void loadNextPage() {
+        currentPage++;
+        loadPokemonsList(true, true);
+    }
+
+    private boolean isLastPage() {
+        return repository.getPokemonsCount() > 0 && Math.round(repository.getPokemonsCount() / PAGE_SIZE) <= currentPage;
+    }
+
+    @Override
+    public void refresh() {
+        currentPage = 0;
+        repository.clearCache();
+        loadPokemonsList(true, false);
+    }
+
+    private void loadPokemonsList(boolean forceRefresh, boolean addToExisting) {
         view.showProgress(true);
         if (repository.isLoading())
             return;
@@ -36,14 +70,18 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
         if (forceRefresh) {
             repository.refreshData();
         }
-        disposable.add(RxUtils.wrapAsync(repository.getPokemonsList(0))
+        disposable.add(RxUtils.wrapAsync(repository.getPokemonsList(currentPage))
                 .doOnError(throwable -> {
                     view.showProgress(false);
                     view.showPokemonsLoadingError();
                 })
                 .subscribe(pokemonList -> {
                     view.showProgress(false);
-                    view.displayPokemonsList(pokemonList);
+                    if (addToExisting) {
+                        view.addPokemonsList(pokemonList);
+                    } else {
+                        view.displayPokemonsList(pokemonList);
+                    }
                 }));
     }
 
