@@ -1,6 +1,7 @@
-package com.natatisha.pokemonapp.ui;
+package com.natatisha.pokemonapp.ui.list;
 
 import com.natatisha.pokemonapp.data.source.PokemonsRepository;
+import com.natatisha.pokemonapp.ui.list.PokemonsListContract;
 import com.natatisha.pokemonapp.utils.RxUtils;
 
 import javax.inject.Inject;

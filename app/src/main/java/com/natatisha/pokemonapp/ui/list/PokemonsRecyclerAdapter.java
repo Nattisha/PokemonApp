@@ -1,4 +1,4 @@
-package com.natatisha.pokemonapp.ui;
+package com.natatisha.pokemonapp.ui.list;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,19 +19,24 @@ public class PokemonsRecyclerAdapter extends RecyclerView.Adapter<PokemonsRecycl
 
     private List<Pokemon> pokemonsList;
 
-    public PokemonsRecyclerAdapter(List<Pokemon> pokemonsList) {
+    private PokemonClickListener clickListener;
+
+    public PokemonsRecyclerAdapter(List<Pokemon> pokemonsList, PokemonClickListener clickListener) {
         this.pokemonsList = pokemonsList;
+        this.clickListener = clickListener;
     }
 
-    public void refreshData(List<Pokemon> pokemonList){
+    public void refreshData(List<Pokemon> pokemonList) {
         this.pokemonsList = pokemonList;
         notifyDataSetChanged();
     }
 
     @Override
     public PokemonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PokemonViewHolder(LayoutInflater.from(parent.getContext()).
+        PokemonViewHolder holder = new PokemonViewHolder(LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.pokemon_list_item, parent, false));
+        holder.itemView.setOnClickListener(view -> clickListener.onClick(pokemonsList.get(holder.getAdapterPosition()).getId()));
+        return holder;
     }
 
     @Override

@@ -1,5 +1,6 @@
-package com.natatisha.pokemonapp.ui;
+package com.natatisha.pokemonapp.ui.list;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,6 +10,7 @@ import android.view.Menu;
 
 import com.natatisha.pokemonapp.R;
 import com.natatisha.pokemonapp.data.model.Pokemon;
+import com.natatisha.pokemonapp.ui.info.PokemonInfoActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +21,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import dagger.android.support.DaggerAppCompatActivity;
 
+import static com.natatisha.pokemonapp.utils.Constants.IS_LOADING_KEY;
+import static com.natatisha.pokemonapp.utils.Constants.IS_SNACK_BAR_SHOWING_KEY;
+import static com.natatisha.pokemonapp.utils.Constants.POKEMON_ID_KEY;
+
 public class PokemonsListActivity extends DaggerAppCompatActivity implements PokemonsListContract.View {
 
     private static final String TAG = PokemonsListActivity.class.getName();
-
-    private static final String IS_LOADING_KEY = "is_loading";
-    private static final String IS_SNACK_BAR_SHOWING_KEY = "is_snackbar_showing";
 
     @Inject
     PokemonsListContract.Presenter presenter;
@@ -42,19 +45,34 @@ public class PokemonsListActivity extends DaggerAppCompatActivity implements Pok
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initView();
-        presenter.bind(this);
-        presenter.loadData(savedInstanceState == null);
+        if (savedInstanceState == null) {
+            initView();
+            presenter.bind(this);
+            presenter.loadData(savedInstanceState == null);
+        }
     }
 
     private void initView() {
         setContentView(R.layout.activity_pokemon);
         ButterKnife.bind(this);
-        adapter = new PokemonsRecyclerAdapter(new ArrayList<>());
+        adapter = new PokemonsRecyclerAdapter(new ArrayList<>(), pokemonClickListener);
         pokemonsRecycler.setAdapter(adapter);
         pokemonsRecycler.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 //        refreshLayout.setOnRefreshListener(() -> presenter.loadData(true));
         showErrorSnackBar();
+    }
+
+    private PokemonClickListener pokemonClickListener = new PokemonClickListener() {
+        @Override
+        public void onClick(int id) {
+            showPokemonInfoScreen(id);
+        }
+    };
+
+    private void showPokemonInfoScreen(int id) {
+        Intent intent = new Intent(this, PokemonInfoActivity.class);
+        intent.putExtra(POKEMON_ID_KEY, id);
+        startActivity(intent);
     }
 
     @Override

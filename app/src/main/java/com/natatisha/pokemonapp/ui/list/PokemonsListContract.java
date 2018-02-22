@@ -1,4 +1,4 @@
-package com.natatisha.pokemonapp.ui;
+package com.natatisha.pokemonapp.ui.list;
 
 import com.natatisha.pokemonapp.data.model.Pokemon;
 
