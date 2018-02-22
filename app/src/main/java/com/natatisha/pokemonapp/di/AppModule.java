@@ -3,7 +3,11 @@ package com.natatisha.pokemonapp.di;
 import android.app.Application;
 import android.content.Context;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.natatisha.pokemonapp.data.model.NamedApiResource;
+import com.natatisha.pokemonapp.network.NamedApiResourceAdapter;
 import com.natatisha.pokemonapp.network.PokemonApi;
 import com.natatisha.pokemonapp.network.PokemonApiClient;
 import com.natatisha.pokemonapp.network.PokemonApiService;
@@ -31,7 +35,10 @@ public abstract class AppModule {
     @Singleton
     @Provides
     static Gson gson() {
-        return new Gson();
+        return new GsonBuilder().
+                setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).
+                registerTypeAdapter(NamedApiResource.class, new NamedApiResourceAdapter()).
+                create();
     }
 
     @Singleton
