@@ -47,7 +47,6 @@ public class PokemonInfoPresenter implements PokemonInfoContract.Presenter {
 
     @Override
     public void unbind() {
-        compositeDisposable.clear();
         compositeDisposable.dispose();
     }
 }

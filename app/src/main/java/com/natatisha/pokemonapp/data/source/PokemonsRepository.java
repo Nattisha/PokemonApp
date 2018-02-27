@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 
 import static com.natatisha.pokemonapp.utils.Constants.PAGE_SIZE;
 
@@ -40,11 +39,9 @@ public class PokemonsRepository {
         if (cacheIsDirty) {
             return remoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE).
                     map(pokemonList -> {
-                        Observable.create(subscriber -> {
-                            localDataSource.savePokemonsList(pokemonList);
-                            cacheIsDirty = false;
-                            setLoadingCompleted(subscriber);
-                        }).subscribe();
+                        localDataSource.savePokemonsList(pokemonList);
+                        cacheIsDirty = false;
+                        isLoading = false;
                         return pokemonList;
                     });
         }
@@ -56,10 +53,8 @@ public class PokemonsRepository {
         if (!localDataSource.hasPokemon(id)) {
             return remoteDataSource.getPokemon(id).
                     map(pokemon -> {
-                        Observable.create(subscriber -> {
-                            localDataSource.savePokemon(pokemon);
-                            setLoadingCompleted(subscriber);
-                        }).subscribe();
+                        localDataSource.savePokemon(pokemon);
+                        isLoading = false;
                         return pokemon;
                     });
         } else {
@@ -67,16 +62,11 @@ public class PokemonsRepository {
         }
     }
 
-    private void setLoadingCompleted(ObservableEmitter<Object> subscriber) {
-        isLoading = false;
-        subscriber.onComplete();
-    }
-
     public int getCacheSize() {
         return localDataSource.getCacheSize();
     }
 
-    public int getPokemonsCount(){
+    public int getPokemonsCount() {
         return remoteDataSource.getItemsCount();
     }
 
@@ -84,7 +74,7 @@ public class PokemonsRepository {
         return isLoading;
     }
 
-    public void clearCache(){
+    public void clearCache() {
         localDataSource.deleteAll();
     }
 }

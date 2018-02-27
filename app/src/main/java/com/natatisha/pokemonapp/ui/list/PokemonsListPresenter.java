@@ -51,10 +51,6 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
         loadPokemonsList(true, true);
     }
 
-    private boolean isLastPage() {
-        return repository.getPokemonsCount() > 0 && Math.round(repository.getPokemonsCount() / PAGE_SIZE) <= currentPage;
-    }
-
     @Override
     public void refresh() {
         currentPage = 0;
@@ -87,7 +83,6 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
 
     @Override
     public void unbind() {
-        disposable.clear();
         disposable.dispose();
     }
 }
