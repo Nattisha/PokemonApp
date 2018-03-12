@@ -36,9 +36,8 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
                 getPokemonList(offset, limit).map(namedApiResourceList -> {
             itemsCount = namedApiResourceList.getCount();
             List<Pokemon> result = new ArrayList<>();
-            for (NamedApiResource namedApiResource : namedApiResourceList.getResults()) {
-                result.add(getDefaultPokemon(namedApiResource.getName(), namedApiResource.getId()));
-            }
+            namedApiResourceList.getResults().forEach(namedApiResource ->
+                    result.add(getDefaultPokemon(namedApiResource.getName(), namedApiResource.getId())));
             return result;
         }).onErrorReturn(throwable -> new ArrayList<>());
 
