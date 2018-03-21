@@ -2,7 +2,7 @@ package com.natatisha.pokemonapp.data.source;
 
 import android.support.annotation.NonNull;
 
-import com.natatisha.pokemonapp.data.model.NamedApiResource;
+import com.annimon.stream.Stream;
 import com.natatisha.pokemonapp.data.model.Pokemon;
 import com.natatisha.pokemonapp.data.model.PokemonSprites;
 import com.natatisha.pokemonapp.network.PokemonApi;
@@ -36,7 +36,7 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
                 getPokemonList(offset, limit).map(namedApiResourceList -> {
             itemsCount = namedApiResourceList.getCount();
             List<Pokemon> result = new ArrayList<>();
-            namedApiResourceList.getResults().forEach(namedApiResource ->
+            Stream.of(namedApiResourceList.getResults()).forEach(namedApiResource ->
                     result.add(getDefaultPokemon(namedApiResource.getName(), namedApiResource.getId())));
             return result;
         }).onErrorReturn(throwable -> new ArrayList<>());

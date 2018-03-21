@@ -11,6 +11,7 @@ ext {
             buildToolsVersion: '26.0.2',
             picasso          : '2.5.2',
             picassoTransform : '2.1.2',
+            streams          : '1.1.9'
     ]
 
     supportDeps = [
@@ -23,7 +24,8 @@ ext {
 
     rxJava = [
             rxJava   : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
-            rxAndroid: "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid"
+            rxAndroid: "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
+            streams:   "com.annimon:stream:$versions.streams"
     ]
 
     retrofitApi = [
