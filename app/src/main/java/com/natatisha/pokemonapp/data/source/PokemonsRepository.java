@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 import static com.natatisha.pokemonapp.utils.Constants.PAGE_SIZE;
@@ -44,13 +45,14 @@ public class PokemonsRepository {
                         isLoading = false;
                         return pokemonList;
                     });
+        } else {
+            return localDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE);
         }
-        return localDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE);
     }
 
     public Observable<Pokemon> getPokemon(int id) {
         isLoading = true;
-        if (!localDataSource.hasPokemon(id)) {
+        if (!localDataSource.hasFullPokemonInfo(id)) {
             return remoteDataSource.getPokemon(id).
                     map(pokemon -> {
                         localDataSource.savePokemon(pokemon);
@@ -62,10 +64,6 @@ public class PokemonsRepository {
         }
     }
 
-    public int getCacheSize() {
-        return localDataSource.getCacheSize();
-    }
-
     public int getPokemonsCount() {
         return remoteDataSource.getItemsCount();
     }
@@ -74,7 +72,7 @@ public class PokemonsRepository {
         return isLoading;
     }
 
-    public void clearCache() {
-        localDataSource.deleteAll();
+    public Completable clearCache() {
+        return localDataSource.deleteAll();
     }
 }

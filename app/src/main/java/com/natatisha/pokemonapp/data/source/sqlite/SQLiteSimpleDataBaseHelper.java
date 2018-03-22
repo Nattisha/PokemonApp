@@ -20,7 +20,7 @@ import javax.inject.Inject;
  * Class which executes SQLite operations.
  * Different query styles (raw + using Android wrapper classes) are made by purpose
  */
-public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements PokemonsDatabaseHelper {
+public class SQLiteSimpleDataBaseHelper extends SQLiteOpenHelper implements PokemonsDatabaseHelper {
 
     private static final int DB_VERSION = 1;
     private static final String DB_NAME = "pokemons_db";
@@ -35,7 +35,7 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     private static final String KEY_POKEMON_EXPERIENCE = "pokemon_experience";
 
     @Inject
-    public SQLitePokemonsDataBaseHelper(Context context) {
+    public SQLiteSimpleDataBaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
@@ -59,11 +59,16 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     }
 
     @Override
-    public void addPokemon(@NonNull Pokemon pokemon) {
+    public void insertPokemon(@NonNull Pokemon pokemon) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = getPokemonContentValues(pokemon);
 
-        db.insert(POKEMONS_TABLE, null, values);
+        if (!isPokemonExists(pokemon.getId())) {
+            db.insert(POKEMONS_TABLE, null, values);
+        } else {
+            db.update(POKEMONS_TABLE, values, KEY_POKEMON_ID + " = ?",
+                    new String[]{String.valueOf(pokemon.getId())});
+        }
         db.close();
     }
 
@@ -78,14 +83,6 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
                 db.insert(POKEMONS_TABLE, null, values);
             }
         }
-        db.close();
-    }
-
-    @Override
-    public void updatePokemon(@NonNull Pokemon pokemon) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = getPokemonContentValues(pokemon);
-        db.update(POKEMONS_TABLE, values, KEY_POKEMON_ID + " = ?", new String[]{String.valueOf(pokemon.getId())});
         db.close();
     }
 
@@ -194,7 +191,7 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_EXPERIENCE)),
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_WEIGHT)),
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_HEIGHT)),
-                new PokemonSprites(cursor.getString(cursor.getColumnIndex(KEY_POKEMON_BACK)),
+                new PokemonSprites(0, cursor.getString(cursor.getColumnIndex(KEY_POKEMON_BACK)),
                         cursor.getString(cursor.getColumnIndex(KEY_POKEMON_FRONT))));
     }
 
@@ -214,7 +211,7 @@ public class SQLitePokemonsDataBaseHelper extends SQLiteOpenHelper implements Po
     private Pokemon getDefaultPokemon(String name, int id) {
         return new Pokemon(id,
                 name,
-                0, 0, 0, new PokemonSprites(null, null));
+                0, 0, 0, new PokemonSprites(0, null, null));
     }
 
     //</editor-fold>

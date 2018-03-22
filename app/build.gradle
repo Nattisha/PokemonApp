@@ -34,6 +34,7 @@ dependencies {
     api helpLibs
     api picassoLibs
     api picassoTransform
+    api room
 
     annotationProcessor annotationsLibs
 

@@ -1,13 +1,15 @@
 package com.natatisha.pokemonapp.ui.list;
 
+import com.natatisha.pokemonapp.data.model.Pokemon;
 import com.natatisha.pokemonapp.data.source.PokemonsRepository;
 import com.natatisha.pokemonapp.utils.RxUtils;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-
-import static com.natatisha.pokemonapp.utils.Constants.PAGE_SIZE;
 
 public class PokemonsListPresenter implements PokemonsListContract.Presenter {
 
@@ -42,23 +44,22 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
 
     @Override
     public void loadData(boolean forceRefresh) {
-        loadPokemonsList(forceRefresh, false);
+        loadPokemonsList(false, forceRefresh, false);
     }
 
     @Override
     public void loadNextPage() {
         currentPage++;
-        loadPokemonsList(true, true);
+        loadPokemonsList(false, true, true);
     }
 
     @Override
     public void refresh() {
         currentPage = 0;
-        repository.clearCache();
-        loadPokemonsList(true, false);
+        loadPokemonsList(true, true, false);
     }
 
-    private void loadPokemonsList(boolean forceRefresh, boolean addToExisting) {
+    private void loadPokemonsList(boolean cleanCache, boolean forceRefresh, boolean addToExisting) {
         view.showProgress(true);
         if (repository.isLoading())
             return;
@@ -66,11 +67,16 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
         if (forceRefresh) {
             repository.refreshData();
         }
-        disposable.add(RxUtils.wrapAsync(repository.getPokemonsList(currentPage))
+
+        Observable<List<Pokemon>> observable = cleanCache ?
+                repository.clearCache().andThen(repository.getPokemonsList(currentPage)) :
+                repository.getPokemonsList(currentPage);
+        disposable.add(RxUtils.wrapAsync(observable)
                 .doOnError(throwable -> {
                     view.showProgress(false);
                     view.showPokemonsLoadingError();
                 })
+                .filter(pokemonList -> !pokemonList.isEmpty())
                 .subscribe(pokemonList -> {
                     view.showProgress(false);
                     if (addToExisting) {

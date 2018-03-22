@@ -6,6 +6,7 @@ import com.natatisha.pokemonapp.data.model.Pokemon;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public interface PokemonsDataSource {
@@ -22,11 +23,9 @@ public interface PokemonsDataSource {
 
         void savePokemonsList(@NonNull List<Pokemon> pokemonList);
 
-        boolean hasPokemon(int id);
+        boolean hasFullPokemonInfo(int id);
 
-        int getCacheSize();
-
-        void deleteAll();
+        Completable deleteAll();
     }
 
     interface Remote {

@@ -3,64 +3,59 @@ package com.natatisha.pokemonapp.data.source;
 import android.support.annotation.NonNull;
 
 import com.natatisha.pokemonapp.data.model.Pokemon;
-import com.natatisha.pokemonapp.data.source.sqlite.PokemonsDatabaseHelper;
+import com.natatisha.pokemonapp.data.source.room.PokemonDao;
+import com.natatisha.pokemonapp.data.source.room.PokemonsDataBase;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
 
-    private PokemonsDatabaseHelper pokemonsDatabaseHelper;
+    private PokemonDao pokemonDao;
 
     @Inject
-    public PokemonsLocalDataSource(@NonNull PokemonsDatabaseHelper pokemonsDatabaseHelper) {
-        this.pokemonsDatabaseHelper = pokemonsDatabaseHelper;
+    public PokemonsLocalDataSource(@NonNull PokemonsDataBase pokemonDb) {
+        this.pokemonDao = pokemonDb.pokemonDao();
     }
 
     @Override
     public Observable<List<Pokemon>> getPokemonsList() {
-        return Observable.just(pokemonsDatabaseHelper.getAllPokemons());
+        return pokemonDao.getPokemonsList().toObservable();
     }
 
     @Override
     public Observable<List<Pokemon>> getPokemonsList(int offset, int limit) {
-        return Observable.just(pokemonsDatabaseHelper.getPokemonsList(offset, limit));
+        return pokemonDao.getPokemonsList().toObservable();
     }
 
     @Override
     public Observable<Pokemon> getPokemon(int id) {
-        return Observable.just(pokemonsDatabaseHelper.getPokemon(id));
+        return pokemonDao.getPokemon(id).toObservable();
     }
 
     @Override
     public void savePokemon(@NonNull Pokemon pokemon) {
-        if (pokemonsDatabaseHelper.isPokemonExists(pokemon.getId())) {
-            pokemonsDatabaseHelper.updatePokemon(pokemon);
-        } else {
-            pokemonsDatabaseHelper.addPokemon(pokemon);
-        }
+         pokemonDao.savePokemon(pokemon);
     }
 
     @Override
     public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        pokemonsDatabaseHelper.addPokemons(pokemonList);
+         pokemonDao.savePokemonsList(pokemonList);
     }
 
     @Override
-    public boolean hasPokemon(int id) {
-        return pokemonsDatabaseHelper.isPokemonExists(id) && pokemonsDatabaseHelper.hasFullInfo(id);
+    public boolean hasFullPokemonInfo(int id) {
+        Pokemon pokemon = pokemonDao.getPokemon(id).blockingFirst();
+        return pokemon != null /*&& pokemon.getSprites().getBackDefault() != null
+                && !pokemon.getSprites().getBackDefault().isEmpty()*/;
     }
 
     @Override
-    public int getCacheSize() {
-        return pokemonsDatabaseHelper.getPokemonsCount();
-    }
-
-    @Override
-    public void deleteAll() {
-        pokemonsDatabaseHelper.deleteAll();
+    public Completable deleteAll() {
+        return Completable.fromRunnable(() -> pokemonDao.deleteAll());
     }
 }

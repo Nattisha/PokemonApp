@@ -8,11 +8,9 @@ import java.util.List;
 
 public interface PokemonsDatabaseHelper {
 
-    void addPokemon(@NonNull Pokemon pokemon);
+    void insertPokemon(@NonNull Pokemon pokemon);
 
     void addPokemons(@NonNull List<Pokemon> pokemon);
-
-    void updatePokemon(@NonNull Pokemon pokemon);
 
     void deletePokemon(int id);
 
