@@ -42,9 +42,8 @@ public class PokemonsRepository {
                     map(pokemonList -> {
                         localDataSource.savePokemonsList(pokemonList);
                         cacheIsDirty = false;
-                        isLoading = false;
                         return pokemonList;
-                    });
+                    }).doFinally(() -> isLoading = false);
         } else {
             return localDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE);
         }
