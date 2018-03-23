@@ -60,7 +60,7 @@ public class PokemonsRepository {
                         return pokemon;
                     });
         } else {
-            return localDataSource.getPokemon(id).doOnComplete(() -> isLoading = false);
+            return localDataSource.getPokemon(id).doFinally(() -> isLoading = false);
         }
     }
 

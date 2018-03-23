@@ -191,7 +191,7 @@ public class SQLiteSimpleDataBaseHelper extends SQLiteOpenHelper implements Poke
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_EXPERIENCE)),
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_WEIGHT)),
                 cursor.getInt(cursor.getColumnIndex(KEY_POKEMON_HEIGHT)),
-                new PokemonSprites(0, cursor.getString(cursor.getColumnIndex(KEY_POKEMON_BACK)),
+                new PokemonSprites(cursor.getString(cursor.getColumnIndex(KEY_POKEMON_BACK)),
                         cursor.getString(cursor.getColumnIndex(KEY_POKEMON_FRONT))));
     }
 
@@ -211,7 +211,7 @@ public class SQLiteSimpleDataBaseHelper extends SQLiteOpenHelper implements Poke
     private Pokemon getDefaultPokemon(String name, int id) {
         return new Pokemon(id,
                 name,
-                0, 0, 0, new PokemonSprites(0, null, null));
+                0, 0, 0, new PokemonSprites(null, null));
     }
 
     //</editor-fold>

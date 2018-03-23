@@ -1,9 +1,6 @@
 package com.natatisha.pokemonapp.data.model
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Embedded
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
 import com.natatisha.pokemonapp.utils.Constants.KEY_POKEMON_ID
 import com.natatisha.pokemonapp.utils.Constants.POKEMONS_TABLE
 
@@ -17,12 +14,9 @@ data class Pokemon(
         val weight: Int = -1,
         val height: Int = -1,
         @Embedded
-        val sprites: PokemonSprites)
+        val sprites: PokemonSprites?)
 
-@Entity
 data class PokemonSprites(
-        @PrimaryKey
-        val id: Int,
         val backDefault: String?,
         val frontDefault: String?
 )

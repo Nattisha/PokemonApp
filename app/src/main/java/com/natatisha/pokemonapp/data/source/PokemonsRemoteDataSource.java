@@ -48,7 +48,7 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
         return new Pokemon(id,
                 name,
                 0, 0, 0,
-                new PokemonSprites(0, null, null));
+                new PokemonSprites(null, null));
     }
 
     @Override

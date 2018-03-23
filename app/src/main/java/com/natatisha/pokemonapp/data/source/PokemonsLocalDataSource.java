@@ -39,19 +39,19 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
 
     @Override
     public void savePokemon(@NonNull Pokemon pokemon) {
-         pokemonDao.savePokemon(pokemon);
+        pokemonDao.savePokemon(pokemon);
     }
 
     @Override
     public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-         pokemonDao.savePokemonsList(pokemonList);
+        pokemonDao.savePokemonsList(pokemonList);
     }
 
     @Override
     public boolean hasFullPokemonInfo(int id) {
         Pokemon pokemon = pokemonDao.getPokemon(id).blockingFirst();
-        return pokemon != null /*&& pokemon.getSprites().getBackDefault() != null
-                && !pokemon.getSprites().getBackDefault().isEmpty()*/;
+        return pokemon != null && pokemon.getSprites() != null && pokemon.getSprites().getBackDefault() != null
+                && !pokemon.getSprites().getBackDefault().isEmpty();
     }
 
     @Override
@@ -59,3 +59,4 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
         return Completable.fromRunnable(() -> pokemonDao.deleteAll());
     }
 }
+
