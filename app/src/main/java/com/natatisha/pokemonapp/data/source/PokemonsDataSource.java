@@ -21,7 +21,7 @@ public interface PokemonsDataSource {
 
         void savePokemon(@NonNull Pokemon pokemon);
 
-        void savePokemonsList(@NonNull List<Pokemon> pokemonList);
+        Completable savePokemonsList(@NonNull List<Pokemon> pokemonList);
 
         boolean hasFullPokemonInfo(int id);
 

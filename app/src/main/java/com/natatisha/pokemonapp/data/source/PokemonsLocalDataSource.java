@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
 
@@ -43,8 +44,10 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
     }
 
     @Override
-    public void savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        pokemonDao.savePokemonsList(pokemonList);
+    public Completable savePokemonsList(@NonNull List<Pokemon> pokemonList) {
+        return Completable.fromAction(() -> pokemonDao.savePokemonsList(pokemonList))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
     }
 
     @Override

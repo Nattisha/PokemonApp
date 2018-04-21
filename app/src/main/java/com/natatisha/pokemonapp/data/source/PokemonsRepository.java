@@ -37,16 +37,26 @@ public class PokemonsRepository {
     }
 
     public Observable<List<Pokemon>> getPokemonsList(int page) {
+        Observable<List<Pokemon>> cachedResult = getCachedData(page);
+        Observable<List<Pokemon>> remoteResult = getDataFromApi(page);
         if (cacheIsDirty) {
-            return remoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE).
-                    map(pokemonList -> {
-                        localDataSource.savePokemonsList(pokemonList);
-                        cacheIsDirty = false;
-                        return pokemonList;
-                    }).doFinally(() -> isLoading = false);
+            return Observable.concat(remoteResult, cachedResult.filter(pokemons -> !pokemons.isEmpty()))
+                    .doFinally(() -> isLoading = false);
         } else {
-            return localDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE);
+            return cachedResult.doFinally(() -> isLoading = false);
         }
+    }
+
+    private Observable<List<Pokemon>> getDataFromApi(int page) {
+        return remoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE)
+                .doOnNext(pokemonList -> {
+                    localDataSource.savePokemonsList(pokemonList);
+                    cacheIsDirty = false;
+                });
+    }
+
+    private Observable<List<Pokemon>> getCachedData(int page) {
+        return localDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE);
     }
 
     public Observable<Pokemon> getPokemon(int id) {
