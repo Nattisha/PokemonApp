@@ -1,5 +1,6 @@
 package com.natatisha.pokemonapp.data.source;
 
+import android.arch.paging.DataSource;
 import android.support.annotation.NonNull;
 
 import com.natatisha.pokemonapp.data.model.Pokemon;
@@ -12,7 +13,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
 
@@ -23,14 +23,15 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
         this.pokemonDao = pokemonDb.pokemonDao();
     }
 
+
     @Override
-    public Observable<List<Pokemon>> getPokemonsList() {
-        return pokemonDao.getPokemonsList().toObservable();
+    public DataSource.Factory<Integer, Pokemon> getPokemonsList() {
+        return pokemonDao.getPokemonsList();
     }
 
     @Override
-    public Observable<List<Pokemon>> getPokemonsList(int offset, int limit) {
-        return pokemonDao.getPokemonsList().toObservable();
+    public DataSource.Factory<Integer, Pokemon> getPokemonsList(int offset, int limit) {
+        return pokemonDao.getPokemonsList(offset, limit);
     }
 
     @Override
@@ -45,9 +46,7 @@ public class PokemonsLocalDataSource implements PokemonsDataSource.Local {
 
     @Override
     public Completable savePokemonsList(@NonNull List<Pokemon> pokemonList) {
-        return Completable.fromAction(() -> pokemonDao.savePokemonsList(pokemonList))
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io());
+        return Completable.fromAction(() -> pokemonDao.savePokemonsList(pokemonList));
     }
 
     @Override

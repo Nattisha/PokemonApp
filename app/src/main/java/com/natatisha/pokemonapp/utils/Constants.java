@@ -11,7 +11,8 @@ public interface Constants {
     String IS_SNACK_BAR_SHOWING_KEY = "is_snackbar_showing";
 
     int PAGINATION_MARGIN = 10;
-    int PAGE_SIZE = 50;
+    int NETWORK_PAGE_SIZE = 30;
+    int DB_PAGE_SIZE = 50;
 
 
     int DB_VERSION = 1;

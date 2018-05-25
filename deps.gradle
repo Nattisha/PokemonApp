@@ -1,18 +1,21 @@
 ext {
     versions = [
             okHttp           : '3.8.1',
-            support          : '26.1.0',
+            support          : '27.1.0',
             constraint       : '1.0.2',
             retrofit         : '2.3.0',
             rxAndroid        : '2.0.1',
             rxJava           : '2.1.0',
             dagger2          : '2.13',
             butterknife      : '8.7.0',
-            buildToolsVersion: '26.0.2',
+            buildToolsVersion: '27.0.2',
             picasso          : '2.5.2',
             picassoTransform : '2.1.2',
             room             : '1.1.0-alpha3',
-            streams          : '1.1.9'
+            streams          : '1.1.9',
+            paging           : '1.0.0',
+            pagingRx         : '1.0.0-rc1',
+            multidex         : '1.0.1'
     ]
 
     supportDeps = [
@@ -20,7 +23,12 @@ ext {
             recyclerView: "com.android.support:recyclerview-v7:$versions.support",
             design      : "com.android.support:design:$versions.support",
             cardView    : "com.android.support:cardview-v7:$versions.support",
-            constraint  : "com.android.support.constraint:constraint-layout:$versions.constraint"
+            constraint  : "com.android.support.constraint:constraint-layout:$versions.constraint",
+    ]
+
+    paging = [
+            paging  : "android.arch.paging:runtime:$versions.paging",
+            pagingRx: "android.arch.paging:rxjava2:$versions.pagingRx"
     ]
 
     rxJava = [
@@ -45,6 +53,7 @@ ext {
             butterknife  : "com.jakewharton:butterknife:$versions.butterknife",
             gson         : 'com.google.code.gson:gson:2.8.1',
             daggerSupport: "com.google.dagger:dagger-android-support:$versions.dagger2",
+            multidex     : "com.android.support:multidex:$versions.multidex"
     ]
 
     annotations = [
@@ -77,4 +86,5 @@ ext {
     picassoLibs = picasso.values()
     picassoTransform = picassoTransform.values()
     room = roomDeps.values()
+    paging = paging.values()
 }

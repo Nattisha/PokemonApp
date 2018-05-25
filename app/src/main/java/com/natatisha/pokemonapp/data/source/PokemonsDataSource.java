@@ -1,5 +1,7 @@
 package com.natatisha.pokemonapp.data.source;
 
+import android.arch.paging.DataSource;
+import android.arch.paging.PagedList;
 import android.support.annotation.NonNull;
 
 import com.natatisha.pokemonapp.data.model.Pokemon;
@@ -13,9 +15,9 @@ public interface PokemonsDataSource {
 
     interface Local {
 
-        Observable<List<Pokemon>> getPokemonsList();
+        DataSource.Factory<Integer, Pokemon>  getPokemonsList();
 
-        Observable<List<Pokemon>> getPokemonsList(int offset, int limit);
+        DataSource.Factory<Integer, Pokemon> getPokemonsList(int offset, int limit);
 
         Observable<Pokemon> getPokemon(int id);
 
@@ -29,8 +31,6 @@ public interface PokemonsDataSource {
     }
 
     interface Remote {
-
-        int getItemsCount();
 
         Observable<List<Pokemon>> getPokemonsList(int offset, int limit);
 

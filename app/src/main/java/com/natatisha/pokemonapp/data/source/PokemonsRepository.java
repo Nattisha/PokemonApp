@@ -1,10 +1,12 @@
 package com.natatisha.pokemonapp.data.source;
 
+import android.arch.paging.DataSource;
+import android.arch.paging.PagedList;
+import android.arch.paging.RxPagedListBuilder;
 import android.support.annotation.NonNull;
 
+import com.natatisha.pokemonapp.data.PageBoundaryCallback;
 import com.natatisha.pokemonapp.data.model.Pokemon;
-
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -12,7 +14,7 @@ import javax.inject.Singleton;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 
-import static com.natatisha.pokemonapp.utils.Constants.PAGE_SIZE;
+import static com.natatisha.pokemonapp.utils.Constants.DB_PAGE_SIZE;
 
 @Singleton
 public class PokemonsRepository {
@@ -36,27 +38,15 @@ public class PokemonsRepository {
         cacheIsDirty = true;
     }
 
-    public Observable<List<Pokemon>> getPokemonsList(int page) {
-        Observable<List<Pokemon>> cachedResult = getCachedData(page);
-        Observable<List<Pokemon>> remoteResult = getDataFromApi(page);
-        if (cacheIsDirty) {
-            return Observable.concat(remoteResult, cachedResult.filter(pokemons -> !pokemons.isEmpty()))
-                    .doFinally(() -> isLoading = false);
-        } else {
-            return cachedResult.doFinally(() -> isLoading = false);
-        }
-    }
-
-    private Observable<List<Pokemon>> getDataFromApi(int page) {
-        return remoteDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE)
-                .doOnNext(pokemonList -> {
-                    localDataSource.savePokemonsList(pokemonList);
-                    cacheIsDirty = false;
-                });
-    }
-
-    private Observable<List<Pokemon>> getCachedData(int page) {
-        return localDataSource.getPokemonsList(page * PAGE_SIZE, PAGE_SIZE);
+    public Observable<PagedList<Pokemon>> getPokemonsList() {
+        DataSource.Factory<Integer, Pokemon> data = localDataSource.getPokemonsList();
+        Observable<PagedList<Pokemon>> result = new RxPagedListBuilder<>(data, DB_PAGE_SIZE)
+                .setBoundaryCallback(new PageBoundaryCallback(localDataSource, remoteDataSource))
+                .buildObservable()
+                .doFinally(() -> isLoading = false);
+        return cacheIsDirty ?
+                localDataSource.deleteAll()
+                        .andThen(result) : result;
     }
 
     public Observable<Pokemon> getPokemon(int id) {
@@ -71,10 +61,6 @@ public class PokemonsRepository {
         } else {
             return localDataSource.getPokemon(id).doFinally(() -> isLoading = false);
         }
-    }
-
-    public int getPokemonsCount() {
-        return remoteDataSource.getItemsCount();
     }
 
     public boolean isLoading() {

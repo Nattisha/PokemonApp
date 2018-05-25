@@ -1,5 +1,6 @@
 package com.natatisha.pokemonapp.data.source.room;
 
+import android.arch.paging.DataSource;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -10,9 +11,7 @@ import com.natatisha.pokemonapp.data.model.Pokemon;
 
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 
 import static com.natatisha.pokemonapp.utils.Constants.KEY_POKEMON_ID;
 import static com.natatisha.pokemonapp.utils.Constants.POKEMONS_TABLE;
@@ -21,10 +20,10 @@ import static com.natatisha.pokemonapp.utils.Constants.POKEMONS_TABLE;
 public interface PokemonDao {
 
     @Query("SELECT * FROM " + POKEMONS_TABLE)
-    Flowable<List<Pokemon>> getPokemonsList();
+    DataSource.Factory<Integer, Pokemon> getPokemonsList();
 
     @Query("SELECT * FROM " + POKEMONS_TABLE + " LIMIT :limit OFFSET :offset")
-    Flowable<List<Pokemon>> getPokemonsList(int offset, int limit);
+    DataSource.Factory<Integer, Pokemon> getPokemonsList(int offset, int limit);
 
     @Query("SELECT * FROM " + POKEMONS_TABLE + " WHERE " + KEY_POKEMON_ID + " = :id")
     Flowable<Pokemon> getPokemon(int id);

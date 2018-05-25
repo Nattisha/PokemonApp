@@ -26,11 +26,6 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
     }
 
     @Override
-    public int getItemsCount() {
-        return itemsCount;
-    }
-
-    @Override
     public Observable<List<Pokemon>> getPokemonsList(int offset, int limit) {
         return pokemonApi.
                 getPokemonList(offset, limit).map(namedApiResourceList -> {
@@ -39,7 +34,7 @@ public class PokemonsRemoteDataSource implements PokemonsDataSource.Remote {
             Stream.of(namedApiResourceList.getResults()).forEach(namedApiResource ->
                     result.add(getDefaultPokemon(namedApiResource.getName(), namedApiResource.getId())));
             return result;
-        }).onErrorReturn(throwable -> new ArrayList<>());
+        });
 
     }
 

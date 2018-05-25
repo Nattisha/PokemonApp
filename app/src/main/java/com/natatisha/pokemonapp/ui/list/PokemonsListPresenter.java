@@ -1,15 +1,16 @@
 package com.natatisha.pokemonapp.ui.list;
 
+import android.arch.paging.PagedList;
+
 import com.natatisha.pokemonapp.data.model.Pokemon;
 import com.natatisha.pokemonapp.data.source.PokemonsRepository;
-import com.natatisha.pokemonapp.utils.RxUtils;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class PokemonsListPresenter implements PokemonsListContract.Presenter {
 
@@ -33,33 +34,17 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
     }
 
     @Override
-    public int getCurrentPage() {
-        return currentPage;
-    }
-
-    @Override
-    public void setCurrentPage(int page) {
-        this.currentPage = page;
-    }
-
-    @Override
     public void loadData(boolean forceRefresh) {
-        loadPokemonsList(false, forceRefresh, false);
-    }
-
-    @Override
-    public void loadNextPage() {
-        currentPage++;
-        loadPokemonsList(false, true, true);
+        loadPokemonsList(forceRefresh);
     }
 
     @Override
     public void refresh() {
         currentPage = 0;
-        loadPokemonsList(true, true, false);
+        loadPokemonsList(true);
     }
 
-    private void loadPokemonsList(boolean cleanCache, boolean forceRefresh, boolean addToExisting) {
+    private void loadPokemonsList(boolean forceRefresh) {
         view.showProgress(true);
         if (repository.isLoading())
             return;
@@ -68,23 +53,19 @@ public class PokemonsListPresenter implements PokemonsListContract.Presenter {
             repository.refreshData();
         }
 
-        Observable<List<Pokemon>> observable = cleanCache ?
-                repository.clearCache().andThen(repository.getPokemonsList(currentPage)) :
-                repository.getPokemonsList(currentPage);
-        disposable.add(RxUtils.wrapAsync(observable)
+        disposable.add(repository.getPokemonsList()
+                .filter(pokemons -> !pokemons.isEmpty())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> {
                     view.showProgress(false);
                     view.showPokemonsLoadingError();
                 })
-                .filter(pokemonList -> !pokemonList.isEmpty())
                 .subscribe(pokemonList -> {
                     view.showProgress(false);
-                    if (addToExisting) {
-                        view.addPokemonsList(pokemonList);
-                    } else {
-                        view.displayPokemonsList(pokemonList);
-                    }
-                }));
+                    view.displayPokemonsList(pokemonList);
+                })
+        );
     }
 
     @Override
